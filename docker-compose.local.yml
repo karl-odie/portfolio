@@ -37,10 +37,9 @@ services:
   redis:
     image: docker.io/redis:6
     container_name: portfolio_local_redis
-    
+
     volumes:
       - portfolio_local_redis_data:/data
-    
 
   celeryworker:
     <<: *django

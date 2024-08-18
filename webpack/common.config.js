@@ -11,10 +11,7 @@ module.exports = {
     index: path.resolve(__dirname, '../frontend/index.tsx'),
   },
   output: {
-    path: path.resolve(
-      __dirname,
-      '../static/webpack_bundles/',
-    ),
+    path: path.resolve(__dirname, '../static/webpack_bundles/'),
     publicPath: '/static/webpack_bundles/',
     filename: 'js/[name]-[fullhash].js',
     chunkFilename: 'js/[name]-[hash].js',
@@ -32,13 +29,13 @@ module.exports = {
       {
         test: /\.tsx$/,
         use: 'ts-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
       },
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-        options: { presets: ["@babel/preset-env", "@babel/preset-react"] },
+        options: { presets: ['@babel/preset-env', '@babel/preset-react'] },
       },
       {
         test: /\.s?css$/i,
