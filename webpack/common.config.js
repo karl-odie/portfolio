@@ -8,7 +8,7 @@ module.exports = {
   entry: {
     project: path.resolve(__dirname, '../static/js/project'),
     vendors: path.resolve(__dirname, '../static/js/vendors'),
-    index: path.resolve(__dirname, '../frontend/index.js'),
+    index: path.resolve(__dirname, '../frontend/index.tsx'),
   },
   output: {
     path: path.resolve(
@@ -29,6 +29,11 @@ module.exports = {
   module: {
     rules: [
       // we pass the output from babel loader to react-hot loader
+      {
+        test: /\.tsx$/,
+        use: 'ts-loader',
+        exclude: /node_modules/
+      },
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
@@ -55,6 +60,6 @@ module.exports = {
   },
   resolve: {
     modules: ['node_modules'],
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.tsx', '.ts'],
   },
 };
