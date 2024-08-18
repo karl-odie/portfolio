@@ -276,7 +276,7 @@ portfolio/media/
 
 .pytest_cache/
 .ipython/
-portfolio/static/webpack_bundles/
+static/webpack_bundles/
 webpack-stats.json
 .env
 .envs/*

@@ -8,6 +8,7 @@ module.exports = {
   entry: {
     project: path.resolve(__dirname, '../static/js/project'),
     vendors: path.resolve(__dirname, '../static/js/vendors'),
+    index: path.resolve(__dirname, '../frontend/index.js'),
   },
   output: {
     path: path.resolve(
@@ -29,8 +30,10 @@ module.exports = {
     rules: [
       // we pass the output from babel loader to react-hot loader
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
         loader: 'babel-loader',
+        options: { presets: ["@babel/preset-env", "@babel/preset-react"] },
       },
       {
         test: /\.s?css$/i,
