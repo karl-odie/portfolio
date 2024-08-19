@@ -1,2 +1,5 @@
 * text=auto
 *.sh eol=lf
+**/start eol=lf
+**/entrypoint eol=lf
+compose/production/postgres/maintenance/** eol=lf
