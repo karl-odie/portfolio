@@ -1,5 +1,5 @@
 * text=auto
-*.sh eol=lf
-**/start eol=lf
-**/entrypoint eol=lf
-compose/production/postgres/maintenance/** eol=lf
+*.sh text eol=lf
+**/start text eol=lf
+**/entrypoint text eol=lf
+compose/production/postgres/maintenance/** text eol=lf
