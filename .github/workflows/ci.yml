@@ -52,5 +52,11 @@ jobs:
       - name: Run Django Tests
         run: docker compose -f docker-compose.local.yml run django pytest
 
+      - name: Run Node Tests
+        run: docker compose -f docker-compose.local.yml run node npm test
+
+      - name: Run Cypress Tests
+        run: docker compose -f docker-compose.local.yml -f docker-compose.cypress.yml run cypress npm run start-e2e
+
       - name: Tear down the Stack
-        run: docker compose -f docker-compose.local.yml down
+        run: docker compose -f docker-compose.local.yml -f docker-compose.cypress.yml down

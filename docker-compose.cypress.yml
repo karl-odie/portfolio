@@ -1,0 +1,16 @@
+services:
+  cypress:
+    build:
+      context: .
+      dockerfile: ./compose/local/node/Dockerfile
+    image: portfolio_local_node
+    container_name: portfolio_local_cypress
+    depends_on:
+      - celeryworker
+      - celerybeat
+      - flower
+      - node
+    volumes:
+      - .:/app:z
+      - /app/node_modules
+    command: start-server-and-test dev http://node:3000 e2e
