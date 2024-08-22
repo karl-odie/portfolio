@@ -6,12 +6,10 @@ env:
   COMPOSE_DOCKER_CLI_BUILD: 1
 
 on:
-  pull_request:
-    branches: ['master', 'main']
-    paths-ignore: ['docs/**']
-
+  workflow_dispatch:
   push:
-    branches: ['master', 'main']
+    branches-ignore:
+      - main
     paths-ignore: ['docs/**']
 
 concurrency:
