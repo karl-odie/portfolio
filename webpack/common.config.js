@@ -6,14 +6,12 @@ module.exports = {
   target: 'web',
   context: path.join(__dirname, '../'),
   entry: {
-    project: path.resolve(__dirname, '../portfolio/static/js/project'),
-    vendors: path.resolve(__dirname, '../portfolio/static/js/vendors'),
+    project: path.resolve(__dirname, '../static/js/project'),
+    vendors: path.resolve(__dirname, '../static/js/vendors'),
+    index: path.resolve(__dirname, '../frontend/index.tsx'),
   },
   output: {
-    path: path.resolve(
-      __dirname,
-      '../portfolio/static/webpack_bundles/',
-    ),
+    path: path.resolve(__dirname, '../static/webpack_bundles/'),
     publicPath: '/static/webpack_bundles/',
     filename: 'js/[name]-[fullhash].js',
     chunkFilename: 'js/[name]-[hash].js',
@@ -29,8 +27,15 @@ module.exports = {
     rules: [
       // we pass the output from babel loader to react-hot loader
       {
-        test: /\.js$/,
+        test: /\.tsx$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
         loader: 'babel-loader',
+        options: { presets: ['@babel/preset-env', '@babel/preset-react'] },
       },
       {
         test: /\.s?css$/i,
@@ -52,6 +57,6 @@ module.exports = {
   },
   resolve: {
     modules: ['node_modules'],
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.tsx', '.ts'],
   },
 };
