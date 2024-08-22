@@ -38,6 +38,30 @@ jobs:
       - name: Checkout Code Repository
         uses: actions/checkout@v4
 
+      - name: Construct .envs
+        run: |
+          mkdir -p .envs/.local/
+          echo "USE_DOCKER=yes" >> .envs/.local/.django
+          echo "IPYTHONDIR=/app/.ipython" >> .envs/.local/.django
+          echo "REDIS_URL=${RedisURL}" >> .envs/.local/.django
+          echo "CELERY_FLOWER_USER=${CeleryUser}" >> .envs/.local/.django
+          echo "CELERY_FLOWER_PASSWORD=${CeleryPassword}" >> .envs/.local/.django
+
+          echo "POSTGRES_HOST=${PostgresHost}" >> .envs/.local/.postgres
+          echo "POSTGRES_PORT=${PostgresPort}" >> .envs/.local/.postgres
+          echo "POSTGRES_DB=${PostgresDB}" >> .envs/.local/.postgres
+          echo "POSTGRES_USER=${PostgresUser}" >> .envs/.local/.postgres
+          echo "POSTGRES_PASSWORD=${PostgresPassword}" >> .envs/.local/.postgres
+        env:
+          RedisURL: ${{ secrets.REDISURL }}
+          CeleryUser: ${{ secrets.CELERYUSER }}
+          CeleryPassword: ${{ secrets.CELERYPASSWORD }}
+          PostgresHost: ${{ secrets.POSTGRESHOST }}
+          PostgresPort: ${{ secrets.POSTGRESPORT }}
+          PostgresDB: ${{ secrets.POSTGRESDB }}
+          PostgresUser: ${{ secrets.POSTGRESUSER }}
+          PostgresPassword: ${{ secrets.POSTGRESPASSWORD }}
+
       - name: Build the Stack
         run: docker compose -f docker-compose.local.yml build django
 
