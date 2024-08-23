@@ -25,6 +25,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
     path("frontend/", TemplateView.as_view(template_name="frontend.html")),
+    path("fitness/", include("portfolio.fitness.urls", namespace="fitness")),
     # Media files
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]

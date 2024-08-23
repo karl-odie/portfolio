@@ -126,6 +126,8 @@ ignore = [
           # of types for comparison.
           # Deactivated because it can make the code slow:
           # https://github.com/astral-sh/ruff/issues/7871
+  "SIM108", # Ternary operators are terse.
+  "DJ012", # Modifying the model before saving is a reasonable operation.
 ]
 # The fixes in extend-unsafe-fixes will require
 # provide the `--unsafe-fixes` flag when fixing.

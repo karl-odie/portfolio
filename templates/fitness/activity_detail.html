@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block header %}
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+          integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+          crossorigin="anonymous"></script>
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+        integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+        crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
+          integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
+          crossorigin=""></script>
+  <script src="{% static 'fitness/leaflet-providers.js' %}"></script>
+  <script src="{% static 'fitness/leaflet.groupedlayercontrol.min.js' %}"></script>
+  <link rel="stylesheet"
+        href="{% static 'fitness/leaflet.groupedlayercontrol.min.css' %}" />
+  <script>
+    darkBackground = {
+      %
+      if view.request.user.profile.theme.dark %
+    }
+    true {
+      %
+      else %
+    }
+    false {
+      %
+      endif %
+    };
+    console.log('Background', darkBackground);
+  </script>
+  <script src="{% static 'fitness/shadeRGB.js' %}"></script>
+  <script src="{% static 'fitness/map-and-chart.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+  <style>
+    #map {
+      width: 600px;
+      height: 400px;
+    }
+  </style>
+  <script>
+    $(document).ready(function() {
+      constructView("{% url 'activity-detail' object.id %}");
+    });
+  </script>
+{% endblock header %}
+{% block title %}
+  {{ object.name }}
+{% endblock title %}
+{% block content %}
+  <h1>{{ object.name }}</h1>
+  <div class="col-md-6">
+    <table class="table table-striped table-hover ">
+      <tbody>
+        <tr>
+          <td>Start Time</td>
+          <td>{{ object.local_time }}</td>
+        </tr>
+        <tr>
+          <td>Distance (km)</td>
+          <td>{{ object.display_distance | floatformat }} km</td>
+        </tr>
+        <tr>
+          <td>Duration</td>
+          <td>{{ object.duration_as_string }}</td>
+        </tr>
+        <tr>
+          <td>Average Pace</td>
+          <td>{{ object.average_pace_as_string }} min/km</td>
+        </tr>
+        <tr>
+          <td>Elevation Gain</td>
+          <td>{{ object.elevation | floatformat }} m</td>
+        </tr>
+        <tr>
+          <td>TRIMP Contribution</td>
+          <td>{{ object.trimp | floatformat }}</td>
+        </tr>
+        <tr>
+          <td>Data Points</td>
+          <td>{{ object.data_points }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-md-6">
+    {# djlint:off #}
+    <div id="map" style="width: 100%; height: 400px"></div>
+    {# djlint:on #}
+  </div>
+  {# djlint:off #}
+  <canvas id="myChart" style="width: 100%; height: 400px"></canvas>
+  {# djlint:on #}
+{% endblock content %}
