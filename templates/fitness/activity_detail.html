@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block header %}
+{% block javascript %}
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"
           integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
           crossorigin="anonymous"></script>
@@ -13,28 +13,17 @@
   <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
           integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
           crossorigin=""></script>
-  <script src="{% static 'fitness/leaflet-providers.js' %}"></script>
-  <script src="{% static 'fitness/leaflet.groupedlayercontrol.min.js' %}"></script>
+  <script src="{% static 'fitness/leaflet-providers.js' %}"
+          type="text/javascript"></script>
+  <script src="{% static 'fitness/leaflet.groupedlayercontrol.min.js' %}"
+          type="text/javascript"></script>
   <link rel="stylesheet"
-        href="{% static 'fitness/leaflet.groupedlayercontrol.min.css' %}" />
-  <script>
-    darkBackground = {
-      %
-      if view.request.user.profile.theme.dark %
-    }
-    true {
-      %
-      else %
-    }
-    false {
-      %
-      endif %
-    };
-    console.log('Background', darkBackground);
-  </script>
-  <script src="{% static 'fitness/shadeRGB.js' %}"></script>
-  <script src="{% static 'fitness/map-and-chart.js' %}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+        href="{% static 'fitness/leaflet.groupedlayercontrol.min.css' %}"
+        type="text/css" />
+  <script src="{% static 'fitness/shadeRGB.js' %}", type="text/javascript"></script>
+  <script src="{% static 'fitness/map-and-chart.js' %}", type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"
+          type="text/javascript"></script>
   <style>
     #map {
       width: 600px;
@@ -42,11 +31,12 @@
     }
   </style>
   <script>
+    darkBackground = false;
     $(document).ready(function() {
-      constructView("{% url 'activity-detail' object.id %}");
+      constructView("{% url 'api:activity-detail' object.uuid %}");
     });
   </script>
-{% endblock header %}
+{% endblock javascript %}
 {% block title %}
   {{ object.name }}
 {% endblock title %}

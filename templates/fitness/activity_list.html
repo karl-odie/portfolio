@@ -19,18 +19,10 @@
     <tbody>
       {% for activity in object_list %}
         <tr>
-          <td>
-            <object data="{% url 'activity_svg' activity.id %}"
-                    type="image/svg+xml"
-                    height="50px"
-                    width="50px"
-                    s>
-              <img src="{% url 'activity_svg' activity.id %}" alt="icon" />
-            </object>
-          </td>
+          <td>{% include "fitness/activity.svg" %}</td>
           <td>{{ activity.local_time }}</td>
           <td>
-            <a href="{% url 'activity' activity.id %}">{{ activity.name }}</a>
+            <a href="{% url 'fitness:activity' activity.uuid %}">{{ activity.name }}</a>
           </td>
           <td>{{ activity.display_distance | floatformat }} km</td>
           <td>{{ activity.average_pace_as_string }} min/km</td>

@@ -1,26 +1,10 @@
-{% load static %}
-
-<!DOCTYPE html>
-<html>
-    <head>
-        {% include "fitness/theme.html" %}
-        <script
-        src="https://code.jquery.com/jquery-3.2.1.min.js"
-        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-        crossorigin="anonymous"></script>
-        <script src="{% static 'fitness/get-style.js' %}"></script>
-        <script src="{% static 'fitness/svg-style.js' %}"></script>
-    </head>
-<body style="background-color: transparent ;">
-    <svg height="30" width="30">
-        <polyline class="activity-polyline"
-            points="
-            {% for x, y in object.svg_points %}
-                {{x}}, {{y}}
-            {% endfor %}
-            "
-            style="fill:none;stroke-width:1"
-        />
-    </svg>
-</body>
-</html>
+<svg xmlns="http://www.w3.org/2000/svg" height="30" width="30">
+    <polyline class="activity-polyline"
+        points="
+        {% for x, y in activity.svg_points %}
+            {{x}}, {{y}}
+        {% endfor %}
+        "
+        style="fill:none;stroke-width:1;stroke:black"
+    />
+</svg>

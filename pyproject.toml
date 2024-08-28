@@ -128,11 +128,16 @@ ignore = [
           # https://github.com/astral-sh/ruff/issues/7871
   "SIM108", # Ternary operators are terse.
   "DJ012", # Modifying the model before saving is a reasonable operation.
+  "TID252", # Relative imports are reasonable.
 ]
 # The fixes in extend-unsafe-fixes will require
 # provide the `--unsafe-fixes` flag when fixing.
 extend-unsafe-fixes = [
     "UP038",
+]
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+  "PLR2004"
 ]
 
 [tool.ruff.lint.isort]
