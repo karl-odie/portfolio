@@ -1,52 +1,60 @@
 import datetime
 import math
+import uuid
+from collections.abc import Iterable
 
-import dateutil.parser
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from pytz import timezone
+from pytcx import parse_to_activities
 from timezonefinder import TimezoneFinder
 
 TIMEZONE_FINDER = TimezoneFinder()
 
 
-def average(*args):
+def average(*args) -> float:
     return sum(args) / len(args)
 
 
-def date_array(start, end):
+def date_array(start, end) -> list[datetime.datetime]:
     return [(start + datetime.timedelta(days=i)) for i in range((end - start).days + 1)]
 
 
-def delta_minutes(new, old):
+def delta_minutes(new: datetime.datetime, old: datetime.datetime) -> float:
     return (new - old).total_seconds() / 60.0
 
 
-def heart_rate_reserve(average_heart_rate, minimum_heart_rate, heart_reserve):
+def heart_rate_reserve(
+    average_heart_rate: int,
+    minimum_heart_rate: int,
+    heart_reserve: int,
+) -> float:
     return min(max((average_heart_rate - minimum_heart_rate) / heart_reserve, 0), 1)
 
 
-def height_coordinate(value, average_value, max_range, height):
+def height_coordinate(value, average_value, max_range, height) -> float:
     return (height * (1 - (value - average_value) / max_range)) - (height / 2)
 
 
-def range_and_average(iterable):
+def range_and_average(iterable) -> tuple[float, float]:
     max_value = max(iterable)
     min_value = min(iterable)
     range_value = max_value - min_value
     return range_value, average(max_value, min_value)
 
 
-def width_coordinate(value, average_value, max_range, width):
+def width_coordinate(value, average_value, max_range, width) -> float:
     return (width * (value - average_value) / max_range) + (width / 2)
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
     minimum_heart_rate = models.IntegerField(default=60)
     maximum_heart_rate = models.IntegerField(default=190)
 
@@ -88,16 +96,54 @@ def save_user_profile(sender, instance, **kwargs):  # pragma: no cover
     instance.profile.save()
 
 
+class Point(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    activity = models.ForeignKey("Activity", on_delete=models.CASCADE)
+    time = models.DateTimeField()
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    altitude = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return f"Point({self.uuid})"
+
+
+def haversine(a: Point, b: Point) -> float:
+    earth_radius = 6371000  # m.
+    a_lat = math.radians(a.latitude)
+    b_lat = math.radians(b.latitude)
+    a_lon = math.radians(a.longitude)
+    b_lon = math.radians(b.longitude)
+
+    delta_lat = b_lat - a_lat
+    delta_lon = b_lon - a_lon
+
+    half_chord = (
+        math.sin(delta_lat / 2) ** 2
+        + math.cos(a_lat) * math.cos(b_lat) * math.sin(delta_lon / 2) ** 2
+    )
+    angular_distance = 2 * math.atan2(math.sqrt(half_chord), math.sqrt(1 - half_chord))
+    return earth_radius * angular_distance
+
+
+class Biometrics(models.Model):
+    point = models.OneToOneField(Point, on_delete=models.CASCADE, primary_key=True)
+    heart_rate = models.PositiveSmallIntegerField(null=True, blank=True, default=None)
+    cadence = models.PositiveSmallIntegerField(null=True, blank=True, default=None)
+
+    def __str__(self):
+        return f"Biometrics({self.point})"
+
+
 class Activity(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, primary_key=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
     time = models.DateTimeField()
-    distance = models.FloatField(null=True)
-    duration = models.FloatField(null=True)
-    elevation = models.FloatField(null=True)
-    trimp = models.IntegerField(null=True)
-    data_points = models.IntegerField(null=True)
-    stream = models.JSONField(encoder=DjangoJSONEncoder, null=True)
+    distance = models.FloatField(null=True, blank=True, default=None)
+    duration = models.FloatField(null=True, blank=True, default=None)
+    elevation = models.FloatField(null=True, blank=True, default=None)
+    trimp = models.IntegerField(null=True, blank=True, default=None)
 
     class Meta:
         ordering = ["-time"]
@@ -105,69 +151,53 @@ class Activity(models.Model):
     def __str__(self):
         return f"{self.name} - {self.time}"
 
-    def local_time(self):
-        for first_point in self.stream.values():
-            timezone_name = TIMEZONE_FINDER.timezone_at(
-                lng=first_point["longitude"],
-                lat=first_point["latitude"],
-            )
-            if timezone_name is None:
-                local_zone = timezone("UTC")
-            else:
-                local_zone = timezone(timezone_name)
-            return local_zone.normalize(self.time.astimezone(local_zone)).strftime(
-                "%d %B %Y at %H:%M",
-            )
-        return None
+    def points_with_heart_rate(self) -> Iterable[Point]:
+        return (
+            self.point_set.select_related("biometrics")
+            .filter(biometrics__heart_rate__isnull=False)
+            .order_by("time")
+        )
 
-    def points_with_heart_rate(self):
-        return [a for a in self.point_stream() if a.get("heart_rate")]
-
-    def delta_trimp(self, current_time, last_time, current_heart_rate, last_heart_rate):
+    def delta_trimp(
+        self,
+        current_time: datetime.datetime,
+        last_time: datetime.datetime,
+        current_heart_rate: int,
+        last_heart_rate: int,
+    ) -> float:
         exponent = 1.92 if self.owner.profile.gender == "M" else 1.67
         minutes = delta_minutes(current_time, last_time)
         average_heart_rate = average(current_heart_rate, last_heart_rate)
         reserve = self.owner.profile.percent_of_heart_rate_reserve(average_heart_rate)
         return minutes * reserve * 0.64 * math.exp(exponent * reserve)
 
-    def calculate_trimp(self):
-        trimp = 0
-        last_point = None
+    def calculate_trimp(self) -> float | None:
+        trimp = 0.0
+        last_point: Point | None = None
         for point in self.points_with_heart_rate():
             if last_point is not None:
                 trimp += self.delta_trimp(
-                    point["time"],
-                    last_point["time"],
-                    point["heart_rate"],
-                    last_point["heart_rate"],
+                    point.time,
+                    last_point.time,
+                    point.biometrics.heart_rate,
+                    last_point.biometrics.heart_rate,
                 )
             last_point = point
         return trimp or None
 
-    @staticmethod
-    def decompress(point):
-        if isinstance(point["time"], datetime.datetime):
-            return point
-        expanded = point.copy()
-        expanded["time"] = dateutil.parser.parse(point["time"])
-        return expanded
+    def point_stream(self) -> Iterable[Point]:
+        return self.point_set.order_by("time")
 
-    def point_stream(self):
-        return sorted(
-            [self.decompress(x) for x in self.stream.values()],
-            key=lambda h: h["time"],
-        )
+    def point_stream_with_biometrics(self) -> Iterable[Point]:
+        return self.point_set.select_related("biometrics").order_by("time")
 
-    def track(self):
-        return [(a["latitude"], a["longitude"]) for a in self.point_stream()]
-
-    def adjusted_track(self):
-        track = self.track()
-        max_latitude = max(a[0] for a in track)
+    def adjusted_track(self) -> list[tuple[float, float]]:
+        track = self.point_stream()
+        max_latitude = max(a.latitude for a in track)
         longitude_factor = math.cos(math.radians(max_latitude))
-        return [(a[0], a[1] * longitude_factor) for a in track]
+        return [(a.latitude, a.longitude * longitude_factor) for a in track]
 
-    def svg_points(self, width=30, height=30):
+    def svg_points(self, width=30, height=30) -> list[tuple[float, float]]:
         track = self.adjusted_track()
         latitude_range, average_latitude = range_and_average([a[0] for a in track])
         longitude_range, average_longitude = range_and_average([a[1] for a in track])
@@ -180,13 +210,15 @@ class Activity(models.Model):
             for a in track
         ]
 
-    def display_distance(self, unit="km"):
+    def display_distance(self, unit="km") -> float:
+        distance = self.distance or 0.0
         if unit == "km":
-            return self.distance / 1000.0
-        return self.distance
+            return distance / 1000.0
+        return distance
 
-    def duration_as_string(self):
-        total_seconds = int(self.duration)
+    def duration_as_string(self) -> str:
+        duration = self.duration or 0
+        total_seconds = int(duration)
         total_minutes = int(total_seconds // 60)
         hours = int(total_minutes // 60)
         minutes = total_minutes - (60 * hours)
@@ -195,7 +227,7 @@ class Activity(models.Model):
             return f"{hours}:{minutes:0>2}:{seconds:0>2}"
         return f"{minutes}:{seconds:0>2}"
 
-    def average_pace(self):
+    def average_pace(self) -> float:
         distance = self.display_distance()
         if distance == 0:
             pace = 0
@@ -203,70 +235,46 @@ class Activity(models.Model):
             pace = (self.duration / 60.0) / distance
         return pace
 
-    def average_pace_as_string(self):
+    def average_pace_as_string(self) -> str:
         pace = self.average_pace()
         minutes = int(pace)
         seconds = int((pace - minutes) * 60)
         return f"{minutes}:{seconds:0>2}"
 
-    def has_heart_rate(self):
-        return bool(self.points_with_heart_rate())
+    def has_heart_rate(self) -> bool:
+        return self.point_set.filter(biometrics__heart_rate__isnull=False).count() > 0
 
     @staticmethod
-    def average(points, key):
-        if isinstance(points[0].get(key), datetime.datetime):
-            return points[0][key]
-        return (sum(p.get(key) or 0 for p in points) / len(points)) or None
-
-    @classmethod
-    def condense_points(cls, points):
-        keys = points[0].keys()
-        return {k: cls.average(points, k) for k in keys}
-
-    @staticmethod
-    def reduction_factor(points):
-        return max(len(points) // 200, 1)
-
-    def reduced_points(self):
-        output_points = []
-        current_points = []
-        input_points = self.point_stream()
-        factor = self.reduction_factor(input_points)
-        for index, point in enumerate(input_points):
-            current_points.append(point)
-            if index % factor == 0:
-                output_points.append(self.condense_points(current_points))
-                current_points = []
-        return output_points
-
-    @staticmethod
-    def geo_line(index, new, old):
+    def geo_line(index: int, new: Point, old: Point, rolling_distance: float):
+        delta_distance = haversine(new, old)
+        rolling_distance += delta_distance
+        elapsed = abs((new.time - old.time).total_seconds())
+        speed = delta_distance / elapsed
         line = {
             "type": "Feature",
             "properties": {
                 "id": index,
-                "elevation": new.get("altitude"),
-                "speed": new.get("speed"),
-                "distance": new.get("distance"),
-                "cadence": new.get("cadence"),
+                "elevation": new.altitude,
+                "speed": speed,
+                "distance": rolling_distance,
+                "cadence": new.biometrics.cadence,
+                "heart_rate": new.biometrics.heart_rate,
             },
             "geometry": {
                 "type": "LineString",
                 "coordinates": [
                     [
-                        old.get("longitude"),
-                        old.get("latitude"),
+                        old.longitude,
+                        old.latitude,
                     ],
                     [
-                        new.get("longitude"),
-                        new.get("latitude"),
+                        new.longitude,
+                        new.latitude,
                     ],
                 ],
             },
         }
-        if new.get("heart_rate") is not None:
-            line["properties"]["heart_rate"] = new.get("heart_rate")
-        return line
+        return line, rolling_distance
 
     @staticmethod
     def geo_point(name, point):
@@ -278,19 +286,26 @@ class Activity(models.Model):
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    point.get("longitude"),
-                    point.get("latitude"),
+                    point.longitude,
+                    point.latitude,
                 ],
             },
         }
 
     def geo_json(self):
         data = []
-        points = self.reduced_points()
+        points = list(self.point_stream_with_biometrics())
+        distance = 0
         for index, point in enumerate(points):
             if index > 0:
                 previous_point = points[index - 1]
-                data.append(self.geo_line(index - 1, point, previous_point))
+                line_data, distance = self.geo_line(
+                    index - 1,
+                    point,
+                    previous_point,
+                    distance,
+                )
+                data.append(line_data)
         first = points[0]
         last = points[-1]
         data.append(self.geo_point("progress", first))
@@ -310,6 +325,54 @@ class Activity(models.Model):
         else:
             activities = activities.filter(time__lte=end)
         return activities, start, end
+
+    @classmethod
+    def load_from_tcx_content(cls, user: User, text: str) -> None:
+        activities = parse_to_activities(text)
+        created = []
+        for tcx_activity in activities:
+            duration = (tcx_activity.stop() - tcx_activity.start()).total_seconds()
+            activity = Activity(
+                owner=user,
+                name="Loaded",
+                time=tcx_activity.start(),
+                duration=duration,
+            )
+            activity.save()
+            rolling_distance = 0.0
+            rolling_elevation = 0.0
+            point_number = 0
+            last_point: Point | None = None
+            for lap in tcx_activity.laps:
+                for tcx_point in lap.points:
+                    point_number += 1
+                    point = Point(
+                        activity=activity,
+                        time=tcx_point.time,
+                        latitude=tcx_point.latitude,
+                        longitude=tcx_point.longitude,
+                        altitude=tcx_point.altitude,
+                    )
+                    point.save()
+                    if last_point is not None:
+                        rolling_distance += haversine(point, last_point)
+                        rolling_elevation += max(
+                            0,
+                            (point.altitude - last_point.altitude),
+                        )
+                    last_point = point
+                    biometrics = Biometrics(
+                        point=point,
+                        heart_rate=tcx_point.heart_rate,
+                        cadence=tcx_point.cadence,
+                    )
+                    biometrics.save()
+            activity.distance = rolling_distance
+            activity.elevation = rolling_elevation
+            activity.trimp = activity.calculate_trimp()
+            activity.save()
+            created.append(activity)
+        return created
 
 
 class TrainingStressBalance:
