@@ -1,11 +1,24 @@
-{% extends "base.html" %}
-
+{% load static i18n %}
 {% load render_bundle from webpack_loader %}
 
-{% block title %}
-  Frontend
-{% endblock title %}
-{% block content %}
-  <div id="root" />
-  {% render_bundle 'index' 'js' attrs='defer' %}
-{% endblock content %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>
+      {% block title %}
+        Frontend
+      {% endblock title %}
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="My portfolio page" />
+    <meta name="author" content="Karl Odie" />
+    <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}" />
+  </head>
+  <body>
+    <div id="root" />
+    {% render_bundle 'index' 'js' attrs='defer' %}
+  </body>
+</html>
