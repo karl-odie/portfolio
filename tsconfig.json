@@ -4,12 +4,12 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
-    "module": "es6",
-    "target": "es5",
+    "module": "esnext",
+    "target": "es2022",
     "jsx": "react",
     "allowJs": true,
     "moduleResolution": "node",
-    "lib": ["es6", "dom"]
+    "lib": ["es2020", "dom"]
   },
   "exclude": ["./cypress.config.ts"]
 }
