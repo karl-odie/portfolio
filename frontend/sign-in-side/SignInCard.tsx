@@ -14,6 +14,8 @@ import { styled } from '@mui/material/styles';
 
 import ForgotPassword from './ForgotPassword';
 import { SitemarkIcon } from './CustomIcons';
+import { Input } from '@mui/material';
+import DjangoCSRFToken from './DjangoCSRFToken';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -49,21 +51,22 @@ export default function SignInCard() {
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    //event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
-      email: data.get('email'),
+      login: data.get('login'),
       password: data.get('password'),
+      remember: data.get('remember'),
     });
   };
 
   const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement;
+    const login = document.getElementById('login') as HTMLInputElement;
     const password = document.getElementById('password') as HTMLInputElement;
 
     let isValid = true;
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
+    if (!login.value || !/\S+@\S+\.\S+/.test(login.value)) {
       setEmailError(true);
       setEmailErrorMessage('Please enter a valid email address.');
       isValid = false;
@@ -98,20 +101,23 @@ export default function SignInCard() {
       </Typography>
       <Box
         component="form"
-        onSubmit={handleSubmit}
+        //onSubmit={handleSubmit}
         noValidate
+        method="post"
+        action="/accounts/login/"
         sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
       >
+        <DjangoCSRFToken />
         <FormControl>
-          <FormLabel htmlFor="email">Email</FormLabel>
+          <FormLabel htmlFor="login">Email</FormLabel>
           <TextField
             error={emailError}
             helperText={emailErrorMessage}
-            id="email"
+            id="login"
             type="email"
-            name="email"
+            name="login"
             placeholder="your@email.com"
-            autoComplete="email"
+            autoComplete="login"
             autoFocus
             required
             fullWidth
@@ -148,7 +154,9 @@ export default function SignInCard() {
           />
         </FormControl>
         <FormControlLabel
-          control={<Checkbox value="remember" color="primary" />}
+          control={
+            <Checkbox name="remember" value="remember" color="primary" />
+          }
           label="Remember me"
         />
         <ForgotPassword open={open} handleClose={handleClose} />
