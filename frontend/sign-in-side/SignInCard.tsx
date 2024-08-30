@@ -14,7 +14,6 @@ import { styled } from '@mui/material/styles';
 
 import ForgotPassword from './ForgotPassword';
 import { SitemarkIcon } from './CustomIcons';
-import { Input } from '@mui/material';
 import DjangoCSRFToken from './DjangoCSRFToken';
 
 const Card = styled(MuiCard)(({ theme }) => ({
