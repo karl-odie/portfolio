@@ -43,6 +43,7 @@ export default function SignInCard() {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
+    console.log('Clicked forgot password.');
     setOpen(true);
   };
 

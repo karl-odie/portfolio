@@ -9,7 +9,11 @@
     "jsx": "react",
     "allowJs": true,
     "moduleResolution": "node",
-    "lib": ["es2020", "dom"]
+    "lib": ["es2020", "dom"],
+    "baseUrl": ".",
+    "paths": {
+      "@portfolio/*": ["frontend/*"]
+    }
   },
   "exclude": ["./cypress.config.ts"]
 }
