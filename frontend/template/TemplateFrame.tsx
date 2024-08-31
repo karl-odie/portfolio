@@ -10,6 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
+import CssBaseline from '@mui/material/CssBaseline';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import ToggleColorMode from './ToggleColorMode';
 import getSiteTheme from '../theme/getTheme';
@@ -30,20 +31,35 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 }));
 
 interface TemplateFrameProps {
-  mode: PaletteMode;
-  toggleColorMode: () => void;
   children: React.ReactNode;
 }
 
-export default function TemplateFrame({
-  mode,
-  toggleColorMode,
-  children,
-}: TemplateFrameProps) {
-  const signInSideTheme = createTheme(getSiteTheme(mode));
+export default function TemplateFrame({ children }: TemplateFrameProps) {
+  const [mode, setMode] = React.useState<PaletteMode>('light');
+  const SiteTheme = createTheme(getSiteTheme(mode));
+  // This code only runs on the client side, to determine the system color preference
+  React.useEffect(() => {
+    // Check if there is a preferred mode in localStorage
+    const savedMode = localStorage.getItem('themeMode') as PaletteMode | null;
+    if (savedMode) {
+      setMode(savedMode);
+    } else {
+      // If no preference is found, it uses system preference
+      const systemPrefersDark = window.matchMedia(
+        '(prefers-color-scheme: dark)',
+      ).matches;
+      setMode(systemPrefersDark ? 'dark' : 'light');
+    }
+  }, []);
+
+  const toggleColorMode = () => {
+    const newMode = mode === 'dark' ? 'light' : 'dark';
+    setMode(newMode);
+    localStorage.setItem('themeMode', newMode); // Save the selected mode to localStorage
+  };
 
   return (
-    <ThemeProvider theme={signInSideTheme}>
+    <ThemeProvider theme={SiteTheme}>
       <Box sx={{ height: '100dvh', display: 'flex', flexDirection: 'column' }}>
         <StyledAppBar>
           <Toolbar
@@ -85,7 +101,10 @@ export default function TemplateFrame({
             </Box>
           </Toolbar>
         </StyledAppBar>
-        <Box sx={{ flex: '1 1', overflow: 'auto' }}>{children}</Box>
+        <Box sx={{ flex: '1 1', overflow: 'auto' }}>
+          <CssBaseline enableColorScheme />
+          {children}
+        </Box>
       </Box>
     </ThemeProvider>
   );
