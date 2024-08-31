@@ -2,7 +2,7 @@ import * as React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
 import { createTheme, ThemeProvider, PaletteMode } from '@mui/material/styles';
-import getSignInSideTheme from './theme/getSignInSideTheme';
+import getSignInSideTheme from '../theme/getTheme';
 import SignInCard from './SignInCard';
 import Content from './Content';
 import TemplateFrame from './TemplateFrame';

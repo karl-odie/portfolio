@@ -8,7 +8,7 @@ import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
 import SettingsSuggestRoundedIcon from '@mui/icons-material/SettingsSuggestRounded';
 import ThumbUpAltRoundedIcon from '@mui/icons-material/ThumbUpAltRounded';
 
-import { SitemarkIcon } from './CustomIcons';
+import { SitemarkIcon } from '../components/icons/CustomIcons';
 
 const items = [
   {

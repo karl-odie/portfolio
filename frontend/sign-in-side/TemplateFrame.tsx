@@ -15,7 +15,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import ToggleColorMode from './ToggleColorMode';
-import getSignInSideTheme from './theme/getSignInSideTheme';
+import getSignInSideTheme from '../theme/getTheme';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   position: 'relative',

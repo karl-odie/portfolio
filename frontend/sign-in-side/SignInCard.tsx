@@ -12,8 +12,8 @@ import Typography from '@mui/material/Typography';
 
 import { styled } from '@mui/material/styles';
 
-import { SitemarkIcon } from './CustomIcons';
-import DjangoCSRFToken from './DjangoCSRFToken';
+import { SitemarkIcon } from '../components/icons/CustomIcons';
+import DjangoCSRFToken from '../components/csrf/DjangoCSRFToken';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
