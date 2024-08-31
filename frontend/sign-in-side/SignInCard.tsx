@@ -12,7 +12,6 @@ import Typography from '@mui/material/Typography';
 
 import { styled } from '@mui/material/styles';
 
-import ForgotPassword from './ForgotPassword';
 import { SitemarkIcon } from './CustomIcons';
 import DjangoCSRFToken from './DjangoCSRFToken';
 
@@ -39,26 +38,6 @@ export default function SignInCard() {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => {
-    console.log('Clicked forgot password.');
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    //event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      login: data.get('login'),
-      password: data.get('password'),
-      remember: data.get('remember'),
-    });
-  };
 
   const validateInputs = () => {
     const login = document.getElementById('login') as HTMLInputElement;
@@ -101,7 +80,6 @@ export default function SignInCard() {
       </Typography>
       <Box
         component="form"
-        //onSubmit={handleSubmit}
         noValidate
         method="post"
         action="/accounts/login/"
@@ -158,7 +136,6 @@ export default function SignInCard() {
           }
           label="Remember me"
         />
-        <ForgotPassword open={open} handleClose={handleClose} />
         <Button
           type="submit"
           fullWidth
