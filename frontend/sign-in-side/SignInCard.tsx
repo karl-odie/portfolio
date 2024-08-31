@@ -130,8 +130,7 @@ export default function SignInCard() {
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <FormLabel htmlFor="password">Password</FormLabel>
             <Link
-              component="button"
-              onClick={handleClickOpen}
+              href="/accounts/password/reset/"
               variant="body2"
               sx={{ alignSelf: 'baseline' }}
             >
