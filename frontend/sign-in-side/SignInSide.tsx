@@ -2,16 +2,15 @@ import * as React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
 import { createTheme, ThemeProvider, PaletteMode } from '@mui/material/styles';
-import getSignInSideTheme from '../theme/getTheme';
+import getSiteTheme from '../theme/getTheme';
 import SignInCard from './SignInCard';
 import Content from './Content';
 import TemplateFrame from './TemplateFrame';
 
 export default function SignInSide() {
   const [mode, setMode] = React.useState<PaletteMode>('light');
-  const [showCustomTheme, setShowCustomTheme] = React.useState(true);
   const defaultTheme = createTheme({ palette: { mode } });
-  const SignInSideTheme = createTheme(getSignInSideTheme(mode));
+  const SiteTheme = createTheme(getSiteTheme(mode));
   // This code only runs on the client side, to determine the system color preference
   React.useEffect(() => {
     // Check if there is a preferred mode in localStorage
@@ -33,18 +32,9 @@ export default function SignInSide() {
     localStorage.setItem('themeMode', newMode); // Save the selected mode to localStorage
   };
 
-  const toggleCustomTheme = () => {
-    setShowCustomTheme((prev) => !prev);
-  };
-
   return (
-    <TemplateFrame
-      toggleCustomTheme={toggleCustomTheme}
-      showCustomTheme={showCustomTheme}
-      mode={mode}
-      toggleColorMode={toggleColorMode}
-    >
-      <ThemeProvider theme={showCustomTheme ? SignInSideTheme : defaultTheme}>
+    <TemplateFrame mode={mode} toggleColorMode={toggleColorMode}>
+      <ThemeProvider theme={SiteTheme}>
         <CssBaseline enableColorScheme />
         <Stack
           direction="column"
