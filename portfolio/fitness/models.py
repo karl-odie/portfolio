@@ -4,7 +4,7 @@ import uuid
 from collections.abc import Iterable
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -91,9 +91,15 @@ class Profile(models.Model):
         super().save(*args, **kwargs)
 
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):  # pragma: no cover
-    instance.profile.save()
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def save_user_profile(
+    sender,
+    instance,
+    created,
+    **kwargs,
+):  # pragma: no cover
+    if created:
+        Profile.objects.create(user=instance)
 
 
 class Point(models.Model):
@@ -327,7 +333,7 @@ class Activity(models.Model):
         return activities, start, end
 
     @classmethod
-    def load_from_tcx_content(cls, user: User, text: str) -> None:
+    def load_from_tcx_content(cls, user: AbstractUser, text: str) -> None:
         activities = parse_to_activities(text)
         created = []
         for tcx_activity in activities:
