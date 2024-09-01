@@ -23,7 +23,9 @@
   </head>
   <body>
     {% csrf_token %}
-    <div id="root" />
+    {% block preroot %}
+    {% endblock preroot %}
+    <div id="root"></div>
     {% block react %}
       {% render_bundle 'index' 'js' attrs='defer' %}
     {% endblock react %}

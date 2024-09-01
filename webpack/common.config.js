@@ -10,6 +10,7 @@ module.exports = {
     vendors: path.resolve(__dirname, '../static/js/vendors'),
     index: path.resolve(__dirname, '../frontend/index.tsx'),
     signin: path.resolve(__dirname, '../frontend/signin.tsx'),
+    signup: path.resolve(__dirname, '../frontend/signup.tsx'),
   },
   output: {
     path: path.resolve(__dirname, '../static/webpack_bundles/'),
