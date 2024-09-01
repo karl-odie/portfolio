@@ -148,7 +148,7 @@ class Activity(models.Model):
     time = models.DateTimeField()
     distance = models.FloatField(null=True, blank=True, default=None)
     duration = models.FloatField(null=True, blank=True, default=None)
-    elevation = models.FloatField(null=True, blank=True, default=None)
+    elevation = models.PositiveIntegerField(null=True, blank=True, default=None)
     trimp = models.IntegerField(null=True, blank=True, default=None)
 
     class Meta:
