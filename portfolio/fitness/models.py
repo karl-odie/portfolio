@@ -9,9 +9,6 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from pytcx import parse_to_activities
-from timezonefinder import TimezoneFinder
-
-TIMEZONE_FINDER = TimezoneFinder()
 
 
 def average(*args) -> float:
@@ -338,9 +335,12 @@ class Activity(models.Model):
         created = []
         for tcx_activity in activities:
             duration = (tcx_activity.stop() - tcx_activity.start()).total_seconds()
+            start = tcx_activity.start().isoformat()
+            default_name = f"{tcx_activity.sport} - {start}"
+            tcx_name = tcx_activity.name.strip() or default_name
             activity = Activity(
                 owner=user,
-                name="Loaded",
+                name=tcx_name,
                 time=tcx_activity.start(),
                 duration=duration,
             )
