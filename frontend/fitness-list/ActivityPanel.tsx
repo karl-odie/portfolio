@@ -2,6 +2,13 @@ import * as React from 'react';
 import { Box, Card, CardContent, Typography } from '@mui/material';
 import { Activity } from '@portfolio/api-client';
 import ActivitySVG from './ActivitySVG';
+import {
+  format_distance,
+  format_duration,
+  format_elevation,
+  format_pace,
+} from './Units';
+import Metric from './Metric';
 
 export default function ActivityPanel({ activity }: { activity: Activity }) {
   return (
@@ -10,18 +17,43 @@ export default function ActivityPanel({ activity }: { activity: Activity }) {
         <ActivitySVG activity={activity.uuid} />
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        <CardContent sx={{ flex: '1 0 auto' }}>
-          <Typography component="div" variant="h5">
-            {activity.name}
-          </Typography>
-          <Typography
-            variant="subtitle1"
-            component="div"
-            sx={{ color: 'text.secondary' }}
-          >
-            {activity.time.toLocaleString()}
-          </Typography>
-        </CardContent>
+        <Box>
+          <CardContent sx={{ flex: '1 0 auto' }}>
+            <Typography
+              variant="subtitle1"
+              component="span"
+              sx={{ color: 'text.secondary' }}
+            >
+              {activity.time.toLocaleString()}{' '}
+            </Typography>
+            <Typography component="span" variant="h5">
+              {activity.name}
+            </Typography>
+          </CardContent>
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', margin: '5px' }}>
+            <Metric
+              name="Distance"
+              value={format_distance(activity.distance)}
+            />
+            <Metric
+              name="Duration"
+              value={format_duration(activity.duration)}
+            />
+            <Metric
+              name="Pace"
+              value={format_pace(activity.duration, activity.distance)}
+            />
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', margin: '5px' }}>
+            <Metric
+              name="Elevation"
+              value={format_elevation(activity.elevation)}
+            />
+            <Metric name="TRIMP" value={(activity.trimp || ' -').toString()} />
+          </Box>
+        </Box>
       </Box>
     </Card>
   );

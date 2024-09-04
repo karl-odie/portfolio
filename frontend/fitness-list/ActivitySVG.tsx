@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { useTheme } from '@mui/material/styles';
 import { activityAPI } from '../api/api';
 import { ActivitySVGPoints } from '../api-client';
 
@@ -16,6 +17,7 @@ export default function ActivitySVG({ activity }: { activity: string }) {
   let blankArray: ActivitySVGPoints[] = [];
 
   const [points, SetPoints] = React.useState(blankArray);
+  const theme = useTheme();
 
   React.useEffect(() => {
     activityAPI.activitiesSvgList({ uuid: activity }).then((result) => {
@@ -27,9 +29,9 @@ export default function ActivitySVG({ activity }: { activity: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" height="100" width="100">
       <polyline
+        stroke={theme.palette.text.primary}
         fill="none"
         stroke-width="3px"
-        stroke="white"
         points={points_to_polyline(points)}
       />
     </svg>
