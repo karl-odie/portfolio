@@ -75,7 +75,7 @@ jobs:
         run: docker compose -f docker-compose.local.yml run --rm django python manage.py spectacular --file portfolio/api/schema.yml
 
       - name: Generate API Schema
-        run: docker compose -f docker-compose.local.yml run node npm sync-api
+        run: docker compose -f docker-compose.local.yml run node npm run sync-api
 
       - name: Run Django Tests
         run: docker compose -f docker-compose.local.yml run django pytest
