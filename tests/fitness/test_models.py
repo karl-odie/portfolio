@@ -5,10 +5,12 @@ import pytest
 
 from portfolio.fitness.models import Activity
 from portfolio.fitness.models import Point
+from portfolio.fitness.models import Profile
 from portfolio.fitness.models import haversine
 
 from .factories import ActivityFactory
 from .factories import BiometricsFactory
+from .factories import OwnerFactory
 from .factories import PointFactory
 from .factories import ProfileFactory
 
@@ -24,14 +26,30 @@ def test_profile():
 
 
 @pytest.mark.django_db
-def test_saving():
-    profile = ProfileFactory()
-    assert profile.minimum_heart_rate == 60
-    assert profile.maximum_heart_rate == 190
-    profile = ProfileFactory(minimum_heart_rate=60, maximum_heart_rate=55)
+def test_profile_default():
+    user = OwnerFactory()
+    assert user.profile.minimum_heart_rate == 60
+    assert user.profile.maximum_heart_rate == 190
+
+
+@pytest.mark.django_db
+def test_profile_low_max():
+    user = OwnerFactory()
+    user.profile.minimum_heart_rate = 60
+    user.profile.maximum_heart_rate = 55
+    user.profile.save()
+    profile = Profile.objects.get(user=user)
     assert profile.minimum_heart_rate == 60
     assert profile.maximum_heart_rate == 61
-    profile = ProfileFactory(minimum_heart_rate=0, maximum_heart_rate=0)
+
+
+@pytest.mark.django_db
+def test_profile_zero():
+    user = OwnerFactory()
+    user.profile.minimum_heart_rate = 0
+    user.profile.maximum_heart_rate = 0
+    user.profile.save()
+    profile = Profile.objects.get(user=user)
     assert profile.minimum_heart_rate == 1
     assert profile.maximum_heart_rate == 2
 
@@ -75,7 +93,6 @@ def test_points_with_heart_rate():
 @pytest.mark.django_db
 def test_delta_trimp():
     activity: Activity = ActivityFactory()
-    ProfileFactory(user=activity.owner)
     start = datetime.datetime(2023, 5, 3, 14, 53, 00, tzinfo=datetime.UTC)
     end = datetime.datetime(2023, 5, 3, 14, 57, 00, tzinfo=datetime.UTC)
     trimp = round(activity.delta_trimp(start, end, 170, 150), 5)
@@ -90,7 +107,6 @@ def test_delta_trimp():
 @pytest.mark.django_db
 def test_calculate_trimp():
     activity: Activity = ActivityFactory()
-    ProfileFactory(user=activity.owner)
     BiometricsFactory(point__activity=activity)
     BiometricsFactory(point__activity=activity)
     BiometricsFactory(point__activity=activity)
@@ -189,7 +205,6 @@ def test_haversine():
 @pytest.mark.django_db
 def test_geo_json():
     activity: Activity = ActivityFactory()
-    ProfileFactory(user=activity.owner)
     BiometricsFactory(
         point__activity=activity,
         point__time=datetime.datetime(2023, 5, 3, 11, 45, 0, tzinfo=datetime.UTC),

@@ -1,0 +1,5 @@
+services:
+  django:
+    volumes:
+      - .:/app:z
+      - C:/Users/karlo/Dropbox/Apps/tapiriik:/samples

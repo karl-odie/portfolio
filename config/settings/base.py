@@ -84,6 +84,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
+    "portfolio.api",
     "portfolio.users",
     # Your stuff: custom apps go here
     "portfolio.fitness",

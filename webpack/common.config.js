@@ -11,6 +11,7 @@ module.exports = {
     index: path.resolve(__dirname, '../frontend/index.tsx'),
     signin: path.resolve(__dirname, '../frontend/signin.tsx'),
     signup: path.resolve(__dirname, '../frontend/signup.tsx'),
+    fitness: path.resolve(__dirname, '../frontend/fitness.tsx'),
   },
   output: {
     path: path.resolve(__dirname, '../static/webpack_bundles/'),

@@ -213,6 +213,11 @@ class Activity(models.Model):
             for a in track
         ]
 
+    def svg_points_xy(self, width=30, height=30) -> list[dict[str, float]]:
+        return [
+            {"x": a[0], "y": a[1]} for a in self.svg_points(width=width, height=height)
+        ]
+
     def display_distance(self, unit="km") -> float:
         distance = self.distance or 0.0
         if unit == "km":
@@ -295,7 +300,7 @@ class Activity(models.Model):
             },
         }
 
-    def geo_json(self):
+    def geo_json(self) -> list[dict]:
         data = []
         points = list(self.point_stream_with_biometrics())
         distance = 0

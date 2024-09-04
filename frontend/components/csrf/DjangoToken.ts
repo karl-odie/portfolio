@@ -1,5 +1,5 @@
 var getToken = function () {
-  var tokenValue = null;
+  var tokenValue = 'notokenfound';
   var element = <HTMLInputElement>(
     document.querySelector('[name=csrfmiddlewaretoken]')
   );

@@ -3,7 +3,7 @@ from rest_framework import serializers
 from ..models import Activity
 
 
-class ActivityDetailSerializer(serializers.ModelSerializer):
+class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = (
@@ -15,26 +15,23 @@ class ActivityDetailSerializer(serializers.ModelSerializer):
             "duration",
             "elevation",
             "trimp",
-            "geo_json",
-            "svg_points",
         )
-
-
-class ActivityListSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ("uuid", "name", "time", "distance", "duration", "elevation")
         read_only_fields = fields
-        model = Activity
 
 
-class AcvititySVGSerializer(serializers.ModelSerializer):
+class ActivitySVGSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ("uuid", "svg_points")
         read_only_fields = fields
         model = Activity
 
 
-class AcvitityGeoJSONSerializer(serializers.ModelSerializer):
+class ActivitySVGPointsSerializer(serializers.Serializer):
+    x = serializers.FloatField()
+    y = serializers.FloatField()
+
+
+class ActivityGEOJSONSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ("uuid", "geo_json")
         read_only_fields = fields

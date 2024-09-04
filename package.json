@@ -59,7 +59,8 @@
     "test": "jest",
     "e2e": "cypress run",
     "cyopen": "cypress open",
-    "start-e2e": "start-server-and-test dev http://node:3000 e2e"
+    "start-e2e": "start-server-and-test dev http://node:3000 e2e",
+    "sync-api": "openapi-generator-cli generate -i portfolio/api/schema.yml -g typescript-fetch -o ./frontend/api-client/"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
