@@ -1,4 +1,4 @@
-exclude: '^docs/|/migrations/|devcontainer.json'
+exclude: '(^docs/)|(/migrations/)|(devcontainer.json)|(/api-client/)|(^portfolio.api.schema\.yaml)'
 default_stages: [commit]
 
 default_language_version:

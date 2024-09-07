@@ -12,3 +12,4 @@ venv
 .envs/
 .venv/
 node_modules/
+osm-data/

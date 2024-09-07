@@ -2,6 +2,7 @@ volumes:
   portfolio_local_postgres_data: {}
   portfolio_local_postgres_data_backups: {}
   portfolio_local_redis_data: {}
+  osm-data: {}
 
 services:
   django: &django
