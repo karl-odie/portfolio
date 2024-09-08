@@ -7,6 +7,7 @@ index.ts
 models/Activity.ts
 models/ActivitySVGPoints.ts
 models/AuthToken.ts
+models/Biometrics.ts
 models/PatchedUser.ts
 models/User.ts
 models/index.ts

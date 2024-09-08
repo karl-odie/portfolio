@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Card, CardContent, Typography } from '@mui/material';
+import { Box, Card, CardContent, Typography, Link } from '@mui/material';
 import { Activity } from '@portfolio/api-client';
 import ActivitySVG from './ActivitySVG';
 import {
@@ -19,16 +19,18 @@ export default function ActivityPanel({ activity }: { activity: Activity }) {
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <Box>
           <CardContent sx={{ flex: '1 0 auto' }}>
-            <Typography
-              variant="subtitle1"
-              component="span"
-              sx={{ color: 'text.secondary' }}
-            >
-              {activity.time.toLocaleString()}{' '}
-            </Typography>
-            <Typography component="span" variant="h5">
-              {activity.name}
-            </Typography>
+            <Link href={'/fitness/activity/' + activity.uuid + '/'}>
+              <Typography
+                variant="subtitle1"
+                component="span"
+                sx={{ color: 'text.secondary' }}
+              >
+                {activity.time.toLocaleString()}{' '}
+              </Typography>
+              <Typography component="span" variant="h5">
+                {activity.name}
+              </Typography>
+            </Link>
           </CardContent>
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'row' }}>

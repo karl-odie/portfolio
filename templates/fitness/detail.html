@@ -1,0 +1,9 @@
+{% extends "frontend.html" %}
+
+{% load render_bundle from webpack_loader %}
+
+{% block head %}
+{% endblock head %}
+{% block react %}
+  {% render_bundle 'fitness_detail' 'js' attrs='defer' %}
+{% endblock react %}

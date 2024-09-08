@@ -44,6 +44,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/Activity'
           description: ''
+  /api/activities/{uuid}/biometrics/:
+    get:
+      operationId: activities_biometrics_list
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          description: A UUID string identifying this activity.
+          required: true
+      tags:
+        - activities
+      security:
+        - cookieAuth: []
+        - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Biometrics'
+          description: ''
   /api/activities/{uuid}/geo_json/:
     get:
       operationId: activities_geo_json_retrieve
@@ -456,6 +481,40 @@ components:
         - password
         - token
         - username
+    Biometrics:
+      type: object
+      properties:
+        heart_rate:
+          type: integer
+          readOnly: true
+          nullable: true
+        cadence:
+          type: integer
+          readOnly: true
+          nullable: true
+        time:
+          type: string
+          format: date-time
+          readOnly: true
+        latitude:
+          type: number
+          format: double
+          readOnly: true
+        longitude:
+          type: number
+          format: double
+          readOnly: true
+        altitude:
+          type: number
+          format: double
+          readOnly: true
+      required:
+        - altitude
+        - cadence
+        - heart_rate
+        - latitude
+        - longitude
+        - time
     PatchedUser:
       type: object
       properties:

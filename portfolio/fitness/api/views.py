@@ -36,3 +36,14 @@ class ActivityViewSet(
     def geo_json(self, request: HttpRequest, pk: UUID):
         activity = models.Activity.objects.get(uuid=pk)
         return Response(activity.geo_json())
+
+    @extend_schema(
+        responses=serializers.BiometricsSerializer(many=True),
+    )
+    @action(detail=True)
+    def biometrics(self, request: HttpRequest, pk: UUID):
+        activity = models.Activity.objects.get(uuid=pk)
+        biometrics_query = activity.biometrics_points()
+        return Response(
+            serializers.BiometricsSerializer(biometrics_query, many=True).data,
+        )

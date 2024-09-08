@@ -321,6 +321,17 @@ class Activity(models.Model):
         data.append(self.geo_point("stop", last))
         return data
 
+    def biometrics_points(self) -> list[Biometrics]:
+        return (
+            Biometrics.objects.filter(
+                point__activity__uuid=self.uuid,
+            )
+            .select_related("point")
+            .order_by(
+                "point__time",
+            )
+        )
+
     @classmethod
     def trimp_activities(cls, user, start=None, end=None):
         activities = cls.objects.filter(owner=user).filter(trimp__isnull=False)

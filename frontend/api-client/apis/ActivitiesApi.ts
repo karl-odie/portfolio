@@ -17,13 +17,20 @@ import * as runtime from '../runtime';
 import type {
   Activity,
   ActivitySVGPoints,
+  Biometrics,
 } from '../models/index';
 import {
     ActivityFromJSON,
     ActivityToJSON,
     ActivitySVGPointsFromJSON,
     ActivitySVGPointsToJSON,
+    BiometricsFromJSON,
+    BiometricsToJSON,
 } from '../models/index';
+
+export interface ActivitiesBiometricsListRequest {
+    uuid: string;
+}
 
 export interface ActivitiesGeoJsonRetrieveRequest {
     uuid: string;
@@ -41,6 +48,41 @@ export interface ActivitiesSvgListRequest {
  * 
  */
 export class ActivitiesApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async activitiesBiometricsListRaw(requestParameters: ActivitiesBiometricsListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Biometrics>>> {
+        if (requestParameters['uuid'] == null) {
+            throw new runtime.RequiredError(
+                'uuid',
+                'Required parameter "uuid" was null or undefined when calling activitiesBiometricsList().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // tokenAuth authentication
+        }
+
+        const response = await this.request({
+            path: `/api/activities/{uuid}/biometrics/`.replace(`{${"uuid"}}`, encodeURIComponent(String(requestParameters['uuid']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(BiometricsFromJSON));
+    }
+
+    /**
+     */
+    async activitiesBiometricsList(requestParameters: ActivitiesBiometricsListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Biometrics>> {
+        const response = await this.activitiesBiometricsListRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      */
