@@ -34,11 +34,9 @@ export default function FitnessDetail() {
       });
   }, []);
 
-  var color_key = 'altitude';
-
   function renderMap() {
     if (biometrics.length > 0) {
-      return <FitnessMap biometrics={biometrics} color_key={color_key} />;
+      return <FitnessMap biometrics={biometrics} />;
     }
     return <CircularProgress />;
   }

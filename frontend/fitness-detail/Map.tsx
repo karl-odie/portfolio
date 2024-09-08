@@ -8,6 +8,8 @@ import {
   BioBounds,
   dataBounds,
 } from './track_properties';
+import ControlPanel from './Control';
+import { Box } from '@mui/material';
 
 function startPoint(biometrics: Biometrics[]) {
   if (biometrics.length == 0) {
@@ -131,26 +133,29 @@ function geoJson(biometrics: Biometrics[], color_key: string) {
 
 export default function FitnessMap({
   biometrics,
-  color_key,
 }: {
   biometrics: Biometrics[];
-  color_key: string;
 }) {
+  const [colorKey, setColorKey] = React.useState('altitude');
   console.log('Rendering map from', biometrics);
   return (
-    <Map
-      initialViewState={{
-        bounds: mapBounds(biometrics),
-      }}
-      style={{ width: 600, height: 400 }}
-      mapStyle="/static/map_style.json"
-      maplibreLogo={false}
-    >
-      <Source type="geojson" data={geoJson(biometrics, color_key)}>
-        <Layer {...lineLayer} />
-        <Layer {...startPointLayer} />
-        <Layer {...endPointLayer} />
-      </Source>
-    </Map>
+    <Box sx={{ position: 'relative' }}>
+      <Map
+        initialViewState={{
+          bounds: mapBounds(biometrics),
+        }}
+        style={{ width: 800, height: 800 }}
+        mapStyle="/static/map_style.json"
+        maplibreLogo={false}
+        styleDiffing
+      >
+        <Source type="geojson" data={geoJson(biometrics, colorKey)}>
+          <Layer {...lineLayer} />
+          <Layer {...startPointLayer} />
+          <Layer {...endPointLayer} />
+        </Source>
+      </Map>
+      <ControlPanel value={colorKey} onChange={setColorKey} />
+    </Box>
   );
 }
