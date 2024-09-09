@@ -13,12 +13,11 @@ class UserActivityMixin(LoginRequiredMixin):
 
 
 class ActivityList(UserActivityMixin, ListView):
-    template_name = "fitness/activity_list.html"
-    paginate_by = 30
+    template_name = "fitness/list.html"
 
 
 class ActivityDetail(UserActivityMixin, DetailView):
-    template_name = "fitness/activity_detail.html"
+    template_name = "fitness/detail.html"
 
 
 class ActivitySVG(UserActivityMixin, DetailView):

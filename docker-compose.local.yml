@@ -2,6 +2,7 @@ volumes:
   portfolio_local_postgres_data: {}
   portfolio_local_postgres_data_backups: {}
   portfolio_local_redis_data: {}
+  portfolio_local_node_modules: {}
 
 services:
   django: &django
@@ -80,7 +81,7 @@ services:
     volumes:
       - .:/app:z
       # http://jdlm.info/articles/2016/03/06/lessons-building-node-app-docker.html
-      - /app/node_modules
+      - portfolio_local_node_modules:/app/node_modules
     command: npm run dev
     ports:
       - '3000:3000'

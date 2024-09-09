@@ -28,5 +28,4 @@ django-webpack-loader==3.1.0  # https://github.com/django-webpack/django-webpack
 
 # Fitness
 # ------------------------------------------------------------------------------
-timezonefinder==6.5.2
-pytcx==0.2.1
+pytcx==0.3.2

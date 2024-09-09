@@ -4,14 +4,11 @@ import uuid
 from collections.abc import Iterable
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from pytcx import parse_to_activities
-from timezonefinder import TimezoneFinder
-
-TIMEZONE_FINDER = TimezoneFinder()
 
 
 def average(*args) -> float:
@@ -91,9 +88,15 @@ class Profile(models.Model):
         super().save(*args, **kwargs)
 
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):  # pragma: no cover
-    instance.profile.save()
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def save_user_profile(
+    sender,
+    instance,
+    created,
+    **kwargs,
+):  # pragma: no cover
+    if created:
+        Profile.objects.create(user=instance)
 
 
 class Point(models.Model):
@@ -142,7 +145,7 @@ class Activity(models.Model):
     time = models.DateTimeField()
     distance = models.FloatField(null=True, blank=True, default=None)
     duration = models.FloatField(null=True, blank=True, default=None)
-    elevation = models.FloatField(null=True, blank=True, default=None)
+    elevation = models.PositiveIntegerField(null=True, blank=True, default=None)
     trimp = models.IntegerField(null=True, blank=True, default=None)
 
     class Meta:
@@ -208,6 +211,11 @@ class Activity(models.Model):
                 height_coordinate(a[0], average_latitude, max_range, height),
             )
             for a in track
+        ]
+
+    def svg_points_xy(self, width=30, height=30) -> list[dict[str, float]]:
+        return [
+            {"x": a[0], "y": a[1]} for a in self.svg_points(width=width, height=height)
         ]
 
     def display_distance(self, unit="km") -> float:
@@ -292,7 +300,7 @@ class Activity(models.Model):
             },
         }
 
-    def geo_json(self):
+    def geo_json(self) -> list[dict]:
         data = []
         points = list(self.point_stream_with_biometrics())
         distance = 0
@@ -313,6 +321,17 @@ class Activity(models.Model):
         data.append(self.geo_point("stop", last))
         return data
 
+    def biometrics_points(self) -> list[Biometrics]:
+        return (
+            Biometrics.objects.filter(
+                point__activity__uuid=self.uuid,
+            )
+            .select_related("point")
+            .order_by(
+                "point__time",
+            )
+        )
+
     @classmethod
     def trimp_activities(cls, user, start=None, end=None):
         activities = cls.objects.filter(owner=user).filter(trimp__isnull=False)
@@ -327,14 +346,17 @@ class Activity(models.Model):
         return activities, start, end
 
     @classmethod
-    def load_from_tcx_content(cls, user: User, text: str) -> None:
+    def load_from_tcx_content(cls, user: AbstractUser, text: str) -> None:
         activities = parse_to_activities(text)
         created = []
         for tcx_activity in activities:
             duration = (tcx_activity.stop() - tcx_activity.start()).total_seconds()
+            start = tcx_activity.start().isoformat()
+            default_name = f"{tcx_activity.sport} - {start}"
+            tcx_name = tcx_activity.name.strip() or default_name
             activity = Activity(
                 owner=user,
-                name="Loaded",
+                name=tcx_name,
                 time=tcx_activity.start(),
                 duration=duration,
             )

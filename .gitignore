@@ -281,3 +281,4 @@ webpack-stats.json
 .env
 .envs/**
 !.envs/.local/
+osm-data/

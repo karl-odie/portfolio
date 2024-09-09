@@ -1,0 +1,10 @@
+{% extends "frontend.html" %}
+
+{% load render_bundle from webpack_loader %}
+
+{% block preroot %}
+  {{ form.errors|json_script:'form-errors' }}
+{% endblock preroot %}
+{% block react %}
+  {% render_bundle 'signup' 'js' attrs='defer' %}
+{% endblock react %}

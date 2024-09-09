@@ -9,6 +9,10 @@ module.exports = {
     project: path.resolve(__dirname, '../static/js/project'),
     vendors: path.resolve(__dirname, '../static/js/vendors'),
     index: path.resolve(__dirname, '../frontend/index.tsx'),
+    signin: path.resolve(__dirname, '../frontend/signin.tsx'),
+    signup: path.resolve(__dirname, '../frontend/signup.tsx'),
+    fitness: path.resolve(__dirname, '../frontend/fitness.tsx'),
+    fitness_detail: path.resolve(__dirname, '../frontend/fitness-detail.tsx'),
   },
   output: {
     path: path.resolve(__dirname, '../static/webpack_bundles/'),
@@ -27,7 +31,7 @@ module.exports = {
     rules: [
       // we pass the output from babel loader to react-hot loader
       {
-        test: /\.tsx$/,
+        test: /\.(ts|tsx)$/,
         use: 'ts-loader',
         exclude: /node_modules/,
       },
