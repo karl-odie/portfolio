@@ -10,6 +10,7 @@ import {
 } from './track_properties';
 import ControlPanel from './Control';
 import { Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 function startPoint(biometrics: Biometrics[]) {
   if (biometrics.length == 0) {
@@ -73,8 +74,10 @@ const startPointLayer: LayerProps = {
   id: 'startPoint',
   type: 'circle',
   paint: {
-    'circle-radius': 10,
+    'circle-radius': 7,
     'circle-color': '#00ff00',
+    'circle-stroke-color': '#000000',
+    'circle-stroke-width': 1,
   },
   filter: ['==', 'label', 'start'],
 };
@@ -83,8 +86,10 @@ const endPointLayer: LayerProps = {
   id: 'endPoint',
   type: 'circle',
   paint: {
-    'circle-radius': 10,
+    'circle-radius': 7,
     'circle-color': '#ff0000',
+    'circle-stroke-color': '#000000',
+    'circle-stroke-width': 1,
   },
   filter: ['==', 'label', 'end'],
 };
@@ -108,7 +113,6 @@ function geoJson(biometrics: Biometrics[], color_key: string) {
   for (var i = 1; i < biometrics.length; i++) {
     var previous_point = biometrics[i - 1];
     var current_point = biometrics[i];
-    console.log(previous_point, current_point);
     features.push(geoLine(i, previous_point, current_point, color_key, bounds));
   }
   features.push({
@@ -137,6 +141,16 @@ export default function FitnessMap({
   biometrics: Biometrics[];
 }) {
   const [colorKey, setColorKey] = React.useState('altitude');
+  const theme = useTheme();
+
+  function mapStyle(): string {
+    console.log('Theme', theme);
+    if (theme.palette.mode == 'dark') {
+      return '/static/map_style_dark.json';
+    }
+    return '/static/map_style_light.json';
+  }
+
   console.log('Rendering map from', biometrics);
   return (
     <Box sx={{ position: 'relative' }}>
@@ -145,7 +159,7 @@ export default function FitnessMap({
           bounds: mapBounds(biometrics),
         }}
         style={{ width: 800, height: 800 }}
-        mapStyle="/static/map_style.json"
+        mapStyle={mapStyle()}
         maplibreLogo={false}
         styleDiffing
       >

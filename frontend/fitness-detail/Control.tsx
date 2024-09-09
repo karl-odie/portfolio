@@ -17,15 +17,14 @@ export default function ControlPanel({
     <Card sx={{ position: 'absolute', top: '10px', left: '10px' }}>
       <FormControl>
         <CardContent sx={{ flex: '1 0 auto' }}>
-          <FormLabel id="demo-row-radio-buttons-group-label">
+          <FormLabel id="color-label">
             <Typography variant="subtitle2">Track Color</Typography>
           </FormLabel>
         </CardContent>
         <Box>
           <RadioGroup
-            row
-            aria-labelledby="demo-row-radio-buttons-group-label"
-            name="row-radio-buttons-group"
+            aria-labelledby="color-label"
+            name="radio-buttons-group"
             value={value}
             onChange={(evt) => onChange(evt.target.value)}
           >
